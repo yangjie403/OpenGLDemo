@@ -45,9 +45,24 @@ namespace
         "layout (location = 1) in vec3 aColor;\n"
         "out vec3 vertexColor;\n"
         "uniform float transition;\n"
+        "uniform float xTransition;\n"
         "void main()\n"
         "{\n"
-        "    gl_Position = vec4(aPos, 1.0);\n"
+        "    float x = 0;\n"
+        "    if (xTransition <= 2)\n"
+        "    {\n"
+        "        x = xTransition;\n"
+		"	 }\n"
+        "    else if (xTransition <= 6)\n"
+		"	 {\n"
+        "        x = -1.0 * xTransition + 4;\n"
+		"	 }\n"
+		"	 else\n"
+		"    {\n"
+		"		 x = 1.0 * xTransition - 8;\n"
+        "    }\n"
+        "\n"
+        "    gl_Position = vec4(aPos.x + x / 4, aPos.y, aPos.z, 1.0);\n"
         "\n"
         "    // 状态 0：每个顶点使用自己的初始颜色。\n"
         "    vec3 state0 = aColor;\n"
@@ -215,8 +230,8 @@ int main6()
 
     // 获取顶点着色器中 Uniform 变量 transition 的位置。
     // 位置在程序链接后就不会改变，因此只需要查询一次。
-    GLint transitionLocation =
-        glGetUniformLocation(shaderProgram, "transition");
+    GLint transitionLocation = glGetUniformLocation(shaderProgram, "transition");
+	GLint xTransitionLocation = glGetUniformLocation(shaderProgram, "xTransition");
 
     while (!glfwWindowShouldClose(window))
     {
@@ -245,9 +260,12 @@ int main6()
                 static_cast<double>(TRANSITION_DURATION * 3.0f))
             / static_cast<double>(TRANSITION_DURATION));
 
+		float xTransition = static_cast<float>(std::fmod(timeValue,8));
+
         // 将 CPU 端计算出的 transition 传给 GLSL 中的 uniform。
         // glUniform1f 的最后一个参数对应 GLSL 的 float。
         glUniform1f(transitionLocation, transition);
+		glUniform1f(xTransitionLocation, xTransition);
 
         // 绑定 VAO，恢复位置和颜色属性的配置。
         glBindVertexArray(VAO);
