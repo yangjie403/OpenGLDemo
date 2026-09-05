@@ -1,7 +1,7 @@
-#include "main6.h"
+#include "main7.h"
 
 int main()
 {
-    main6();
+    main7();
     return 0;
 }

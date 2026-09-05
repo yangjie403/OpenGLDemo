@@ -161,6 +161,7 @@
     <ClCompile Include="main4.cpp" />
     <ClCompile Include="main5.cpp" />
     <ClCompile Include="main6.cpp" />
+    <ClCompile Include="main7.cpp" />
     <ClCompile Include="mylog.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <ClInclude Include="main4.h" />
     <ClInclude Include="main5.h" />
     <ClInclude Include="main6.h" />
+    <ClInclude Include="main7.h" />
     <ClInclude Include="mylog.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
