@@ -162,7 +162,9 @@
     <ClCompile Include="main5.cpp" />
     <ClCompile Include="main6.cpp" />
     <ClCompile Include="main7.cpp" />
+    <ClCompile Include="main8.cpp" />
     <ClCompile Include="mylog.cpp" />
+    <ClCompile Include="my_shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main1.h" />
@@ -172,7 +174,13 @@
     <ClInclude Include="main5.h" />
     <ClInclude Include="main6.h" />
     <ClInclude Include="main7.h" />
+    <ClInclude Include="main8.h" />
     <ClInclude Include="mylog.h" />
+    <ClInclude Include="my_shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader8.fs" />
+    <None Include="shaders\shader8.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
