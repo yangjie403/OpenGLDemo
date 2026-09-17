@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -163,8 +163,10 @@
     <ClCompile Include="main6.cpp" />
     <ClCompile Include="main7.cpp" />
     <ClCompile Include="main8.cpp" />
+    <ClCompile Include="main9.cpp" />
     <ClCompile Include="mylog.cpp" />
     <ClCompile Include="my_shader.cpp" />
+    <ClCompile Include="std_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main1.h" />
@@ -175,12 +177,20 @@
     <ClInclude Include="main6.h" />
     <ClInclude Include="main7.h" />
     <ClInclude Include="main8.h" />
+    <ClInclude Include="main9.h" />
     <ClInclude Include="mylog.h" />
     <ClInclude Include="my_shader.h" />
+    <ClInclude Include="std_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader8.fs" />
     <None Include="shaders\shader8.vs" />
+    <None Include="shaders\shader9.fs" />
+    <None Include="shaders\shader9.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\container.jpg" />
+    <Image Include="assets\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
