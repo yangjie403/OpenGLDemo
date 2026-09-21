@@ -156,6 +156,7 @@
     <ClCompile Include="E:\devLibs\glad\src\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main1.cpp" />
+    <ClCompile Include="main10.cpp" />
     <ClCompile Include="main2.cpp" />
     <ClCompile Include="main3.cpp" />
     <ClCompile Include="main4.cpp" />
@@ -170,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main1.h" />
+    <ClInclude Include="main10.h" />
     <ClInclude Include="main2.h" />
     <ClInclude Include="main3.h" />
     <ClInclude Include="main4.h" />
@@ -183,12 +185,15 @@
     <ClInclude Include="std_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\shader10.fs" />
+    <None Include="shaders\shader10.vs" />
     <None Include="shaders\shader8.fs" />
     <None Include="shaders\shader8.vs" />
     <None Include="shaders\shader9.fs" />
     <None Include="shaders\shader9.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\awesomeface.png" />
     <Image Include="assets\container.jpg" />
     <Image Include="assets\wall.jpg" />
   </ItemGroup>

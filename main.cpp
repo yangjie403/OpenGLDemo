@@ -1,7 +1,7 @@
-#include "main9.h"
+#include "main10.h"
 
 int main()
 {
-    main9();
+    main10();
     return 0;
 }
