@@ -158,6 +158,7 @@
     <ClCompile Include="main1.cpp" />
     <ClCompile Include="main10.cpp" />
     <ClCompile Include="main11.cpp" />
+    <ClCompile Include="main12.cpp" />
     <ClCompile Include="main2.cpp" />
     <ClCompile Include="main3.cpp" />
     <ClCompile Include="main4.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="main1.h" />
     <ClInclude Include="main10.h" />
     <ClInclude Include="main11.h" />
+    <ClInclude Include="main12.h" />
     <ClInclude Include="main2.h" />
     <ClInclude Include="main3.h" />
     <ClInclude Include="main4.h" />
@@ -191,6 +193,8 @@
     <None Include="shaders\shader10.vs" />
     <None Include="shaders\shader11.fs" />
     <None Include="shaders\shader11.vs" />
+    <None Include="shaders\shader12.fs" />
+    <None Include="shaders\shader12.vs" />
     <None Include="shaders\shader8.fs" />
     <None Include="shaders\shader8.vs" />
     <None Include="shaders\shader9.fs" />
