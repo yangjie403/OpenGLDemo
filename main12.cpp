@@ -7,9 +7,50 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace {
-    void processInput(GLFWwindow* window) {
+    glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
+    const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+    float yaw = -90.0f, pitch = 0.0f;
+    double lastX = 0.0, lastY = 0.0;
+    bool firstMouse = true;
+
+    void mouseCallback(GLFWwindow*, double x, double y) {
+        if (firstMouse) {
+            lastX = x;
+            lastY = y;
+            firstMouse = false;
+            return;
+        }
+        constexpr float sensitivity = 0.1f;
+        yaw += static_cast<float>(x - lastX) * sensitivity;
+        pitch += static_cast<float>(lastY - y) * sensitivity;
+        lastX = x; lastY = y;
+        pitch = glm::clamp(pitch, -89.0f, 89.0f);
+        float yRad = glm::radians(yaw), pRad = glm::radians(pitch);
+        cameraFront = glm::normalize(glm::vec3(glm::cos(yRad) * glm::cos(pRad), glm::sin(pRad), glm::sin(yRad) * glm::cos(pRad)));
+
+    }
+
+    void processInput(GLFWwindow* window, float dt) {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
+        }
+        glm::vec3 right = glm::normalize(glm::cross(cameraFront, worldUp));
+        glm::vec3 move(0.0f);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            move += cameraFront;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            move -= cameraFront;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            move -= right;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            move += right;
+        }
+        if (glm::length(move) > 0.0f) {
+            cameraPos += glm::normalize(move) * 2.5f * dt;
         }
     }
 
@@ -34,6 +75,8 @@ void main12() {
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         glfwDestroyWindow(window);
@@ -85,6 +128,18 @@ void main12() {
      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+    glm::vec3 cubePositions[] = {
+      glm::vec3(0.0f,  0.0f,  0.0f),
+      glm::vec3(2.0f,  5.0f, -15.0f),
+      glm::vec3(-1.5f, -2.2f, -2.5f),
+      glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3(2.4f, -0.4f, -3.5f),
+      glm::vec3(-1.7f,  3.0f, -7.5f),
+      glm::vec3(1.3f, -2.0f, -2.5f),
+      glm::vec3(1.5f,  2.0f, -2.5f),
+      glm::vec3(1.5f,  0.2f, -1.5f),
+      glm::vec3(-1.3f,  1.0f, -1.5f)
     };
     unsigned int indices[] = {
         0, 1, 3,
@@ -143,8 +198,12 @@ void main12() {
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
     glEnable(GL_DEPTH_TEST);
+    double lastFrame = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
-        processInput(window);
+        double now = glfwGetTime();
+        float dt = glm::clamp(static_cast<float>(now - lastFrame), 0.0f, 0.1f);
+        lastFrame = now;
+        processInput(window, dt);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -170,7 +229,7 @@ void main12() {
 
         // glm::mat4(1.0f) 构造 4×4 单位矩阵：主对角线为 1，其余元素为 0。
         // 单位矩阵相当于“不做任何变换”，因此适合用作变换矩阵的初始值。
-        glm::mat4 model = glm::mat4(1.0f);
+        //glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
 
@@ -184,7 +243,7 @@ void main12() {
         // glm::radians(-55.0f)：将 -55 度转换为弧度；不能直接把角度值当弧度传入。
         // 因为初始 model 是单位矩阵，所以这里得到的是“绕世界原点/模型原点旋转 -55 度”。
         //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         // view（观察矩阵/相机矩阵）：把世界坐标变换到以相机为原点的观察坐标系。
         // OpenGL 中通常让相机位于原点，并沿 -Z 轴观察；因此把场景沿 Z 轴移动 -3，
         // 等价于把相机向 +Z 方向后移 3 个单位，让位于原点附近的物体进入相机视野。
@@ -194,7 +253,8 @@ void main12() {
         // glm::translate(matrix, offset)：在 matrix 的基础上追加平移。
         //   matrix：待变换的原矩阵，这里是单位矩阵 view。
         //   offset：平移向量 (x, y, z)，这里沿 Z 轴负方向移动 3 个单位。
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
 
         // projection（投影矩阵）：把观察坐标变换到裁剪坐标，并定义相机的可见体积。
         // 使用透视投影后，远处物体会显得更小，符合人眼观察效果。
@@ -224,7 +284,7 @@ void main12() {
         //   program：shader program ID，这里是 ourShader.ID；
         //   name   ：GLSL 中声明的 uniform 名称，必须与 shader12.vs 中的名称一致。
         // 返回值是位置编号；如果 uniform 不存在或被编译器优化掉，会返回 -1。
-        unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+        //unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
         unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
 
         // glUniformMatrix4fv(location, count, transpose, value)：上传一个或多个 4×4 浮点矩阵。
@@ -232,16 +292,25 @@ void main12() {
         //   count    ：矩阵数量，这里每次只上传 1 个矩阵；
         //   transpose：是否转置。GLM 默认按列主序存储，与 OpenGL 约定匹配，因此为 GL_FALSE；
         //   value    ：矩阵数据首地址，要求指向连续的 float 数据。
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        //glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
 
         // 上传 projection 矩阵的封装写法。
         ourShader.setMat4("projection", projection);
 
         // VAO 中记录了顶点属性布局，EBO 中记录了索引；绘制时使用上面已经设置好的矩阵。
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(VAO);
+        for (unsigned int i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i + (float)glfwGetTime();
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            ourShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
