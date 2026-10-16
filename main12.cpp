@@ -14,7 +14,26 @@ namespace {
     double lastX = 0.0, lastY = 0.0;
     bool firstMouse = true;
 
+    float verticalVelocity = 0.0f;
+    // 是否在地面
+    bool isGrounded = true;
+    bool spaceWasDown = false;
+    bool altWasDown = false;
+    bool cursorCaptured = false;
+    constexpr float groudY = 0.0f;
+    constexpr float jumpSpeed = 5.0f;
+    constexpr float gravity = 12.0f;
+
+    void setCursorCaptured(GLFWwindow* window, bool captured) {
+        cursorCaptured = captured;
+        firstMouse = true;
+        glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    }
+
     void mouseCallback(GLFWwindow*, double x, double y) {
+        if (!cursorCaptured) {
+            return;
+        }
         if (firstMouse) {
             lastX = x;
             lastY = y;
@@ -28,20 +47,40 @@ namespace {
         pitch = glm::clamp(pitch, -89.0f, 89.0f);
         float yRad = glm::radians(yaw), pRad = glm::radians(pitch);
         cameraFront = glm::normalize(glm::vec3(glm::cos(yRad) * glm::cos(pRad), glm::sin(pRad), glm::sin(yRad) * glm::cos(pRad)));
+    }
 
+    void mouseButtonCallback(GLFWwindow* window, int button, int action, int) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && !cursorCaptured) {
+            setCursorCaptured(window, true);
+        }
     }
 
     void processInput(GLFWwindow* window, float dt) {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
         }
+        bool altDown = glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS;
+        if (altDown && !altWasDown && cursorCaptured) {
+            setCursorCaptured(window, false);
+        }
+        altWasDown = altDown;
+        
+        bool spaceDown = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+        if (spaceDown && !spaceWasDown && isGrounded) {
+            verticalVelocity = jumpSpeed;
+            isGrounded = false;
+        }
+        spaceWasDown = spaceDown;
+
+        // W/S朝水平方向移动，y为0.0f，避免视角抬高时角色飞起来
+        glm::vec3 forward = glm::normalize(glm::vec3(cameraFront.x, 0.0f, cameraFront.z));
         glm::vec3 right = glm::normalize(glm::cross(cameraFront, worldUp));
         glm::vec3 move(0.0f);
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            move += cameraFront;
+            move += forward;
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            move -= cameraFront;
+            move -= forward;
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             move -= right;
@@ -51,6 +90,15 @@ namespace {
         }
         if (glm::length(move) > 0.0f) {
             cameraPos += glm::normalize(move) * 2.5f * dt;
+        }
+        if (!isGrounded) {
+            cameraPos.y += verticalVelocity * dt;
+            verticalVelocity -= gravity * dt;
+            if (cameraPos.y <= groudY) {
+                cameraPos.y = groudY;
+                verticalVelocity = 0.0f;
+                isGrounded = true;
+            }
         }
     }
 
@@ -76,6 +124,7 @@ void main12() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
